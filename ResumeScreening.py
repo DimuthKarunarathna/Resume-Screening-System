@@ -10,14 +10,13 @@ try:
 except LookupError:
     nltk.download('stopwords')
 
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 import streamlit as st
 import joblib
 import PyPDF2
 import re
 import string
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-
 
 # Load the model, vectorizer, and label encoder
 model = joblib.load("models/resume_classifier.pkl")
