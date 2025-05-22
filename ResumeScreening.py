@@ -1,58 +1,71 @@
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
 import streamlit as st
 import joblib
-import PyPDF2  # For extracting text from PDF files
+import PyPDF2
+import re
+import string
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import nltk
+nltk.data.path.append('/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/nltk')
 
-# Load model and vectorizer
-model = joblib.load("/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume/resume_classifier.pkl")
-vectorizer = joblib.load("/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume/vectorizer.pkl")
+# Load the model, vectorizer, and label encoder
+model = joblib.load("/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/models/resume_classifier.pkl")
+tfidf = joblib.load("/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/models/vectorizer.pkl")
+le = joblib.load("/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/models/label_encoder.pkl")
 
-# App UI
+# Define stop words (ensure this is consistent with your training)
+stop_words = set(stopwords.words('english'))
+
+# Define functions (clean_text, extract_text_from_pdf)
+def extract_text_from_pdf(pdf_file):
+    text = ""
+    try:
+        reader = PyPDF2.PdfReader(pdf_file)
+        for page_num in range(len(reader.pages)):
+            page = reader.pages[page_num]
+            text += page.extract_text()
+    except Exception as e:
+        st.error(f"Error extracting text from PDF: {e}")
+        return None
+    return text
+
+def clean_text(text):
+    text = re.sub(r'<.*?>', '', text)  # Remove HTML
+    text = re.sub(r'http\S+|www\S+', '', text)  # Remove links
+    text = text.translate(str.maketrans('', '', string.punctuation))  # Remove punctuation
+    text = text.lower()  # Lowercase
+    words = word_tokenize(text)
+    words = [w for w in words if w.isalpha() and w not in stop_words]
+    return ' '.join(words)
+
+# Streamlit app title
 st.title("Resume Screening System")
-st.write("Upload a PDF resume or paste resume text to classify its job category")
-
-# Job category mapping
-job_categories = {
-    0: "Software Engineer",
-    1: "Data Scientist",
-    2: "Project Manager",
-    3: "Marketing Specialist",
-    4: "Sales Representative",
-    5: "Graphic Designer",
-    6: "HR Specialist",
-    7: "Business Analyst",
-    8: "Content Writer",
-    9: "Financial Analyst",
-    10: "Mechanical Engineer",
-    11: "Civil Engineer",
-    12: "Electrical Engineer",
-    13: "Teacher",
-    14: "Nurse",
-    15: "Other"  # Add more categories as needed
-}
 
 # File uploader
-uploaded_file = st.file_uploader("Upload a PDF resume", type=["pdf"])
+uploaded_file = st.file_uploader("Upload a resume (PDF)", type=["pdf"])
 
-# Text input
-resume_text = ""
 if uploaded_file is not None:
-    try:
-        # Read and extract text from the uploaded PDF
-        pdf_reader = PyPDF2.PdfReader(uploaded_file)
-        for page in pdf_reader.pages:
-            resume_text += page.extract_text()
-        st.success("PDF uploaded and text extracted successfully!")
-    except Exception as e:
-        st.error(f"Error reading PDF file: {e}")
-else:
-    resume_text = st.text_area("Or paste resume text here", height=300)
+    # Extract text
+    resume_text = extract_text_from_pdf(uploaded_file)
 
-if st.button("Classify"):
-    if resume_text.strip() == "":
-        st.warning("Please provide resume text either by uploading a PDF or pasting it.")
-    else:
-        # Vectorize and predict
-        vectorized = vectorizer.transform([resume_text])
-        prediction = model.predict(vectorized)
-        job_category = job_categories.get(prediction[0], "Unknown Category")
-        st.success(f"Predicted Job Category: **{job_category}**")
+    if resume_text:
+        # Clean text
+        cleaned_resume_text = clean_text(resume_text)
+
+        # Vectorize text
+        vectorized_resume = tfidf.transform([cleaned_resume_text])
+
+        # Make prediction
+        predicted_label = model.predict(vectorized_resume)
+
+        # Decode prediction
+        predicted_category = le.inverse_transform(predicted_label)
+
+        # Display result
+        st.subheader("Predicted Category:")
+        st.write(predicted_category[0])
+
+
