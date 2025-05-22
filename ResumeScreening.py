@@ -18,6 +18,25 @@ import PyPDF2
 import re
 import string
 
+import streamlit as st
+
+page_bg_img = '''
+<style>
+body {
+    background-image: url("https://unsplash.com/photos/a-pair-of-glasses-sitting-on-top-of-a-pile-of-paper-rqZaKEjRrdQ");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+</style>
+'''
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
+st.title("Resume Screening System")
+st.write("This app has a custom background image!")
+
 # Load the model, vectorizer, and label encoder
 model = joblib.load("models/resume_classifier.pkl")
 tfidf = joblib.load("models/vectorizer.pkl")
