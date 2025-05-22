@@ -17,25 +17,8 @@ import joblib
 import PyPDF2
 import re
 import string
-
 import streamlit as st
-
-page_bg_img = '''
-<style>
-body {
-    background-image: url("https://unsplash.com/photos/a-pair-of-glasses-sitting-on-top-of-a-pile-of-paper-rqZaKEjRrdQ");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-</style>
-'''
-
-st.markdown(page_bg_img, unsafe_allow_html=True)
-
-st.title("Resume Screening System")
-st.write("This app has a custom background image!")
+import base64
 
 # Load the model, vectorizer, and label encoder
 model = joblib.load("models/resume_classifier.pkl")
@@ -67,6 +50,29 @@ def clean_text(text):
     words = word_tokenize(text)
     words = [w for w in words if w.isalpha() and w not in stop_words]
     return ' '.join(words)
+
+
+def add_bg_from_local(image_file):
+    with open(image_file, "rb") as image:
+        encoded = base64.b64encode(image.read()).decode()
+    css = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/jpg;base64,{encoded}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+# Call this function before your app UI starts
+add_bg_from_local('background.jpg')
+
+st.title("Resume Screening System")
+st.write("Your app is now styled with a local background image!")
+
 
 # Streamlit app title
 st.title("Resume Screening System")
