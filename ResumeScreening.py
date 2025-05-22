@@ -12,9 +12,10 @@ import nltk
 nltk.data.path.append('/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/nltk')
 
 # Load the model, vectorizer, and label encoder
-model = joblib.load("/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/models/resume_classifier.pkl")
-tfidf = joblib.load("/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/models/vectorizer.pkl")
-le = joblib.load("/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/models/label_encoder.pkl")
+model = joblib.load("models/resume_classifier.pkl")
+tfidf = joblib.load("models/vectorizer.pkl")
+le = joblib.load("models/label_encoder.pkl")
+
 
 # Define stop words (ensure this is consistent with your training)
 stop_words = set(stopwords.words('english'))
