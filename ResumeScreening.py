@@ -52,26 +52,23 @@ def clean_text(text):
     return ' '.join(words)
 
 
-def add_bg_from_local(image_file):
-    with open(image_file, "rb") as image:
-        encoded = base64.b64encode(image.read()).decode()
-    css = f"""
-    <style>
-    .stApp {{
-        background-image: url("data:image/jpg;base64,{encoded}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }}
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
+# def add_bg_from_local(image_file):
+#     with open(image_file, "rb") as image:
+#         encoded = base64.b64encode(image.read()).decode()
+#     css = f"""
+#     <style>
+#     .stApp {{
+#         background-image: url("data:image/jpg;base64,{encoded}");
+#         background-size: cover;
+#         background-repeat: no-repeat;
+#         background-attachment: fixed;
+#     }}
+#     </style>
+#     """
+#     st.markdown(css, unsafe_allow_html=True)
 
-# Call this function before your app UI starts
-add_bg_from_local('background.jpg')
-
-st.title("Resume Screening System")
-
+# # Call this function before your app UI starts
+# add_bg_from_local('background.jpg')
 
 
 # Streamlit app title
