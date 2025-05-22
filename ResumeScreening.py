@@ -71,7 +71,7 @@ def add_bg_from_local(image_file):
 add_bg_from_local('background.jpg')
 
 st.title("Resume Screening System")
-st.write("Your app is now styled with a local background image!")
+
 
 
 # Streamlit app title
