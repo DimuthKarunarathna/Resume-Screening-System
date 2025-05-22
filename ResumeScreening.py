@@ -1,6 +1,14 @@
 import nltk
-nltk.download('stopwords')
-nltk.download('punkt')
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
+
 import streamlit as st
 import joblib
 import PyPDF2
@@ -8,8 +16,7 @@ import re
 import string
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import nltk
-nltk.data.path.append('/Users/dimuthshiharakarunarathna/Desktop/kaggle/Resume-Screening-System/nltk')
+
 
 # Load the model, vectorizer, and label encoder
 model = joblib.load("models/resume_classifier.pkl")
